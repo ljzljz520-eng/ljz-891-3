@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>押金查询系统 · 管理后台</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="admin-body">
+
+<!-- 登录页 -->
+<div id="login-view" class="login-wrap">
+  <div class="card">
+    <h2>管理后台登录</h2>
+    <p class="sub" style="margin:0 0 20px">摄影器材租赁押金查询系统</p>
+    <form id="login-form" autocomplete="off">
+      <label><span>账号</span><input name="username" required></label>
+      <label><span>密码</span><input name="password" type="password" required></label>
+      <button type="submit" id="login-btn">登 录</button>
+    </form>
+    <div id="login-msg" class="msg" hidden style="margin-top:14px"></div>
+    <p class="tip">登录失败 5 次将锁定 15 分钟</p>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="app-view" hidden>
+  <div class="topbar">
+    <div class="brand">📷 押金查询后台</div>
+    <div class="right">
+      <span id="whoami"></span>
+      <button class="linkbtn" id="btn-pw">改密码</button>
+      <a href="../">查询页</a>
+      <button class="linkbtn" id="btn-logout">退出</button>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="tabs">
+      <button data-tab="orders" class="active">租赁记录</button>
+      <button data-tab="abnormal">异常订单</button>
+      <button data-tab="logs">查询日志</button>
+    </div>
+
+    <!-- 订单 -->
+    <section id="tab-orders">
+      <div class="toolbar">
+        <input id="o-kw" placeholder="按订单号 / 客户姓名搜索" style="min-width:220px">
+        <select id="o-status">
+          <option value="">全部状态</option>
+          <option value="held">押金占用中</option>
+          <option value="refunding">退款处理中</option>
+          <option value="refunded">已退还</option>
+          <option value="deducted">已扣除</option>
+          <option value="abnormal">异常</option>
+        </select>
+        <button class="btn-sm" id="o-search">筛选</button>
+        <button class="btn-sm" id="o-new" style="margin-left:auto">+ 录入租赁记录</button>
+      </div>
+      <div class="tablewrap">
+        <table class="adm-table">
+          <thead><tr>
+            <th>订单号</th><th>客户</th><th>押金</th><th>状态</th>
+            <th>起租/应还</th><th>归还时间</th><th>退款时间</th><th>异常</th><th>操作</th>
+          </tr></thead>
+          <tbody id="o-rows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="o-pager"></div>
+    </section>
+
+    <!-- 异常 -->
+    <section id="tab-abnormal" hidden>
+      <div class="toolbar">
+        <span class="muted" style="font-size:13px">所有被标记异常的订单集中在这里处理</span>
+        <button class="btn-sm" id="a-refresh" style="margin-left:auto">刷新</button>
+      </div>
+      <div class="tablewrap">
+        <table class="adm-table">
+          <thead><tr>
+            <th>订单号</th><th>客户</th><th>押金</th><th>异常原因</th>
+            <th>标记时间</th><th>操作</th>
+          </tr></thead>
+          <tbody id="a-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 日志 -->
+    <section id="tab-logs" hidden>
+      <div class="toolbar">
+        <input id="l-order" placeholder="订单号精确">
+        <select id="l-result">
+          <option value="">全部结果</option>
+          <option value="ok">成功</option>
+          <option value="bad_order">订单号错</option>
+          <option value="bad_phone">手机号不匹配</option>
+          <option value="rate_locked">限流锁定</option>
+          <option value="error">其他/登录</option>
+        </select>
+        <select id="l-action">
+          <option value="">全部动作</option>
+          <option value="customer_query">客户查询</option>
+          <option value="create">新建订单</option>
+          <option value="update">更新订单</option>
+          <option value="mark_abnormal">标记异常</option>
+          <option value="clear_abnormal">解除异常</option>
+          <option value="admin_view">后台查看</option>
+          <option value="export_logs">导出日志</option>
+          <option value="login_fail">登录失败</option>
+          <option value="login_ok">登录成功</option>
+        </select>
+        <input id="l-from" type="date">
+        <input id="l-to" type="date">
+        <button class="btn-sm" id="l-search">筛选</button>
+        <button class="btn-sm" id="l-export" style="margin-left:auto">导出 CSV</button>
+      </div>
+      <div class="tablewrap">
+        <table class="adm-table">
+          <thead><tr>
+            <th>时间</th><th>动作</th><th>结果</th><th>订单号</th>
+            <th>IP</th><th>详情</th><th>操作人</th>
+          </tr></thead>
+          <tbody id="l-rows"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="l-pager"></div>
+    </section>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<script src="assets/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# 摄影器材租赁押金查询系统 - Nginx + PHP-FPM 示例
+# 把 root 指向项目的 public 化目录；最简单做法是整个项目作为 root，
+# 但必须禁止访问 lib/ data/ sql/ 等目录（下方规则）。
+
+server {
+    listen 443 ssl http2;
+    server_name deposit.example.com;
+
+    root /var/www/rental-deposit;
+    index index.html index.php;
+
+    ssl_certificate     /etc/ssl/deposit.crt;
+    ssl_certificate_key /etc/ssl/deposit.key;
+
+    # 安全响应头
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy no-referrer always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'" always;
+
+    # 敏感目录一律 404
+    location ~ ^/(lib|data|sql)/ { deny all; return 404; }
+    location ~ /\. { deny all; return 404; }
+    location = /install.php { deny all; return 404; }   # 安装完成后禁用
+
+    # API：只允许 POST 的接口拒绝 GET（由 PHP 兜底，这里再省一次请求）
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_pass unix:/run/php/php8.2-fpm.sock;   # 按实际版本改
+        fastcgi_read_timeout 30s;
+        # 隐藏 PHP 版本
+        fastcgi_hide_header X-Powered-By;
+    }
+
+    location / { try_files $uri $uri/ /index.html; }
+}
+
+# 80 跳 HTTPS
+server { listen 80; server_name deposit.example.com; return 301 https://$host$request_uri; }

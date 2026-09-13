@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>摄影器材租赁 · 押金查询</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="logo">📷 光影租赁</div>
+    <h1>押金查询</h1>
+    <p class="sub">输入您的<strong>订单号</strong>和<strong>下单手机号</strong>，查询押金状态、归还情况与退款时间</p>
+  </header>
+
+  <form id="qform" class="card" autocomplete="off">
+    <label>
+      <span>订单号</span>
+      <input name="order_no" placeholder="RC 开头，共 18 位" maxlength="18" required
+             pattern="RC[0-9A-HJ-NP-Za-hj-np-z]{16}" inputmode="latin" spellcheck="false">
+    </label>
+    <label>
+      <span>下单手机号</span>
+      <input name="phone" placeholder="用于核验身份" maxlength="11" inputmode="numeric"
+             pattern="1[3-9][0-9]{9}" required>
+    </label>
+    <button type="submit" id="qbtn">查询押金</button>
+    <p class="tip">🔒 信息仅本人可查。连续查询失败会被临时限制。</p>
+  </form>
+
+  <div id="msg" class="msg" hidden></div>
+
+  <section id="result" class="card result" hidden>
+    <div class="r-head">
+      <div>
+        <div class="muted">订单号</div>
+        <div class="order-no" id="r-order"></div>
+      </div>
+      <span class="badge" id="r-status"></span>
+    </div>
+
+    <div class="deposit-box">
+      <div class="muted">押金金额</div>
+      <div class="amount">¥ <span id="r-amount"></span></div>
+      <div class="muted" id="r-status-text"></div>
+    </div>
+
+    <div class="grid2">
+      <div><div class="muted">起租日期</div><div id="r-start"></div></div>
+      <div><div class="muted">应还日期</div><div id="r-due"></div></div>
+      <div><div class="muted">归还状态</div><div id="r-returned"></div></div>
+      <div><div class="muted">退款时间</div><div id="r-refund"></div></div>
+    </div>
+
+    <div id="r-abnormal" class="abnormal" hidden>
+      ⚠️ 该订单存在异常标记，押金处理可能延迟，请联系门店核实。
+    </div>
+
+    <h3>设备清单</h3>
+    <table class="items">
+      <thead><tr><th>设备</th><th>型号</th><th>机身编号</th><th class="num">数量</th></tr></thead>
+      <tbody id="r-items"></tbody>
+    </table>
+  </section>
+
+  <footer class="foot">
+    <a href="admin/">管理员入口</a>
+  </footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

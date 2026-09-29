@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
+<meta name="robots" content="noindex,nofollow">
+<title>后台管理 · 押金查询系统</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+
+<div id="login-view" class="container">
+  <div class="card login-box">
+    <h2>后台登录</h2>
+    <form id="login-form">
+      <label>账号</label>
+      <input id="lg-user" autocomplete="username" required>
+      <label>密码</label>
+      <input id="lg-pass" type="password" autocomplete="current-password" required>
+      <div style="margin-top:16px"><button type="submit">登录</button></div>
+      <div id="lg-msg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="app-view" class="container wide hide">
+  <div class="hero" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div>
+      <h1>押金查询系统 · 管理后台</h1>
+      <p id="who"></p>
+    </div>
+    <div><a class="btn" href="/" target="_blank" style="background:rgba(255,255,255,.2)">查看前台</a>
+      <button class="ghost" id="logout-btn">退出登录</button></div>
+  </div>
+
+  <div class="tabs">
+    <button data-tab="orders" class="on">租赁记录</button>
+    <button data-tab="logs">查询日志</button>
+    <button data-tab="audit">操作审计</button>
+  </div>
+
+  <!-- 租赁记录 -->
+  <section id="tab-orders">
+    <div class="card">
+      <div class="toolbar">
+        <div style="flex:2;min-width:200px"><label>订单号 / 客户姓名</label><input id="f-q" placeholder="模糊搜索"></div>
+        <div><label>状态</label>
+          <select id="f-status">
+            <option value="">全部</option><option value="active">租赁中</option>
+            <option value="returned">已归还</option><option value="abnormal">异常</option>
+            <option value="closed">已关闭</option>
+          </select>
+        </div>
+        <div><label>退款状态</label>
+          <select id="f-refund">
+            <option value="">全部</option><option value="unpaid">待退款</option>
+            <option value="processing">退款中</option><option value="refunded">已退款</option>
+            <option value="deducted">部分扣除</option>
+          </select>
+        </div>
+        <div><label>手机号</label><input id="f-phone" inputmode="numeric" maxlength="11"></div>
+        <div style="align-self:flex-end"><button id="f-search">搜索</button>
+          <button class="ghost" id="f-reset">重置</button></div>
+        <div style="align-self:flex-end;margin-left:auto"><button id="btn-create">＋ 录入租赁</button></div>
+      </div>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>订单号</th><th>客户</th><th>手机号</th><th>押金</th><th>状态</th>
+          <th>退款</th><th>起租/归还</th><th>操作</th>
+        </tr></thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+      </div>
+      <div class="pager">
+        <button class="ghost sm" id="o-prev">上一页</button>
+        <span id="o-pageinfo"></span>
+        <button class="ghost sm" id="o-next">下一页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 查询日志 -->
+  <section id="tab-logs" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <div><label>结果</label>
+          <select id="l-result">
+            <option value="">全部</option><option value="success">成功</option>
+            <option value="not_found">未找到</option><option value="invalid">参数错误</option>
+          </select></div>
+        <div style="flex:2"><label>订单号（输入过的）</label><input id="l-order"></div>
+        <div><label>开始时间</label><input id="l-from" type="datetime-local"></div>
+        <div><label>结束时间</label><input id="l-to" type="datetime-local"></div>
+        <div style="align-self:flex-end"><button id="l-search">筛选</button>
+          <a class="btn sm" id="l-export" href="#">导出 CSV</a></div>
+      </div>
+      <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>ID</th><th>时间</th><th>订单号输入</th><th>手机号(脱敏)</th>
+        <th>结果</th><th>HTTP</th><th>IP哈希</th><th>UA</th></tr></thead>
+        <tbody id="logs-body"></tbody>
+      </table>
+      </div>
+      <div class="pager">
+        <button class="ghost sm" id="l-prev">上一页</button>
+        <span id="l-pageinfo"></span>
+        <button class="ghost sm" id="l-next">下一页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 审计 -->
+  <section id="tab-audit" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <div style="flex:2"><label>动作关键字</label><input id="a-q"></div>
+        <div style="align-self:flex-end"><button id="a-search">筛选</button></div>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>时间</th><th>账号</th><th>动作</th><th>对象</th><th>详情</th><th>IP</th></tr></thead>
+        <tbody id="audit-body"></tbody>
+      </table>
+      <div class="pager">
+        <button class="ghost sm" id="a-prev">上一页</button>
+        <span id="a-pageinfo"></span>
+        <button class="ghost sm" id="a-next">下一页</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-mask" id="modal-mask">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script src="/assets/admin.js"></script>
+</body>
+</html>

@@ -23,3 +23,10 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 押金系统敏感数据
+/config/.app.key
+/storage/db/*.sqlite
+/storage/db/*.sqlite-wal
+/storage/db/*.sqlite-shm
+/storage/logs/

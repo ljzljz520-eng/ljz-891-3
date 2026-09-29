@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理 · 光影租赁</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<div class="container">
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">🎛️</div>
+      <div><h1>租赁押金管理后台</h1><small>光影摄影器材租赁</small></div>
+    </div>
+    <a class="btn secondary small" href="/">返回查询页</a>
+  </header>
+
+  <!-- 登录视图 -->
+  <div class="card" id="loginView" style="max-width:420px;margin:0 auto;">
+    <h2>管理员登录</h2>
+    <p class="sub">仅限授权工作人员使用，所有操作均会记录日志。</p>
+    <div id="loginAlert" class="alert"></div>
+    <form id="loginForm" autocomplete="off">
+      <div class="form-row">
+        <label>账号</label>
+        <input type="text" id="loginUser" required>
+      </div>
+      <div class="form-row">
+        <label>密码</label>
+        <input type="password" id="loginPass" required>
+      </div>
+      <div class="form-row">
+        <label>安全验证</label>
+        <div class="captcha-row">
+          <input type="text" id="loginCaptchaAnswer" maxlength="6" inputmode="numeric" placeholder="计算结果" required>
+          <div class="captcha-box" id="loginCaptchaBox" title="点击更换">
+            <span id="loginCaptchaQuestion">加载中…</span><span class="refresh">换一张</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn" type="submit" style="width:100%">登 录</button>
+    </form>
+  </div>
+
+  <!-- 主视图 -->
+  <div id="mainView" class="hidden">
+    <div class="admin-layout">
+      <aside class="side">
+        <button class="nav-item active" data-tab="orders">租赁记录</button>
+        <button class="nav-item" data-tab="logs">查询日志</button>
+        <div class="user-box">
+          当前用户：<span id="currentUser">-</span>
+          <button class="btn secondary small" id="logoutBtn" style="margin-top:8px;width:100%">退出登录</button>
+        </div>
+      </aside>
+
+      <div>
+        <!-- 租赁记录 -->
+        <section class="card" id="tab-orders">
+          <div class="section-title">
+            <span>租赁记录</span>
+            <button class="btn small" id="newOrderBtn">＋ 录入租赁记录</button>
+          </div>
+          <div id="orderAlert"></div>
+          <div class="toolbar">
+            <div class="form-row">
+              <label>搜索（订单号/姓名/手机号）</label>
+              <input type="text" id="orderQ" placeholder="关键字">
+            </div>
+            <div class="form-row">
+              <label>租赁状态</label>
+              <select id="filterRental">
+                <option value="">全部</option>
+                <option value="renting">租赁中</option>
+                <option value="returned">已归还</option>
+                <option value="overdue">逾期未还</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>押金状态</label>
+              <select id="filterDeposit">
+                <option value="">全部</option>
+                <option value="held">押金冻结中</option>
+                <option value="deducted">押金已部分扣除</option>
+                <option value="refunding">退款处理中</option>
+                <option value="refunded">押金已退还</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>&nbsp;</label>
+              <select id="filterAbnormal">
+                <option value="">全部订单</option>
+                <option value="1">仅看异常</option>
+              </select>
+            </div>
+            <button class="btn secondary" id="orderSearchBtn">筛选</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>订单号</th><th>客户</th><th>押金(元)</th><th>租赁/押金状态</th>
+              <th>归还 / 退款时间</th><th>标记</th><th>操作</th>
+            </tr></thead>
+            <tbody id="orderTbody"></tbody>
+          </table>
+          <div class="pagination">
+            <button class="btn secondary small" id="orderPrev">上一页</button>
+            <span id="orderPageInfo">-</span>
+            <button class="btn secondary small" id="orderNext">下一页</button>
+          </div>
+        </section>
+
+        <!-- 查询日志 -->
+        <section class="card hidden" id="tab-logs">
+          <div class="section-title">
+            <span>查询与操作日志</span>
+            <button class="btn secondary small" id="exportCsvBtn">导出 CSV</button>
+          </div>
+          <div id="logAlert"></div>
+          <div class="toolbar">
+            <div class="form-row">
+              <label>结果类型</label>
+              <select id="filterResult">
+                <option value="">全部</option>
+                <option value="success">客户查询成功</option>
+                <option value="fail">客户查询失败</option>
+                <option value="locked">触发锁定</option>
+                <option value="login_success">后台登录成功</option>
+                <option value="login_fail">后台登录失败</option>
+                <option value="admin_create">录入订单</option>
+                <option value="admin_update">更新订单</option>
+                <option value="admin_mark_abnormal">标记异常</option>
+                <option value="admin_clear_abnormal">解除异常</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>订单号</label>
+              <input type="text" id="logOrderQ" placeholder="订单号">
+            </div>
+            <div class="form-row">
+              <label>开始时间</label>
+              <input type="datetime-local" id="logStart">
+            </div>
+            <div class="form-row">
+              <label>结束时间</label>
+              <input type="datetime-local" id="logEnd">
+            </div>
+            <button class="btn secondary" id="logSearchBtn">筛选</button>
+          </div>
+          <table>
+            <thead><tr><th>时间</th><th>IP</th><th>订单号</th><th>手机后四位</th><th>结果</th><th>原因</th><th>操作员</th></tr></thead>
+            <tbody id="logTbody"></tbody>
+          </table>
+          <div class="pagination">
+            <button class="btn secondary small" id="logPrev">上一页</button>
+            <span id="logPageInfo">-</span>
+            <button class="btn secondary small" id="logNext">下一页</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 订单录入/编辑弹窗 -->
+<div class="dialog-mask hidden" id="orderDialog">
+  <div class="dialog">
+    <h3 id="orderDialogTitle">录入租赁记录</h3>
+    <div id="orderFormAlert"></div>
+    <form id="orderForm">
+      <input type="hidden" id="of_order_no">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>客户姓名 *</label>
+          <input type="text" id="of_name" required>
+        </div>
+        <div class="form-row">
+          <label>手机号（查询凭证）*</label>
+          <input type="tel" id="of_phone" maxlength="11" required>
+        </div>
+        <div class="form-row">
+          <label>押金金额（元）*</label>
+          <input type="text" id="of_deposit" inputmode="decimal" placeholder="如 8000.00" required>
+        </div>
+        <div class="form-row">
+          <label>租赁状态 *</label>
+          <select id="of_rental_status">
+            <option value="renting">租赁中</option>
+            <option value="returned">已归还</option>
+            <option value="overdue">逾期未还</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>押金状态 *</label>
+          <select id="of_deposit_status">
+            <option value="held">押金冻结中</option>
+            <option value="deducted">押金已部分扣除</option>
+            <option value="refunding">退款处理中</option>
+            <option value="refunded">押金已退还</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>起租时间 *</label>
+          <input type="datetime-local" id="of_rental_start" required>
+        </div>
+        <div class="form-row">
+          <label>应还时间</label>
+          <input type="datetime-local" id="of_rental_end">
+        </div>
+        <div class="form-row">
+          <label>实际归还时间</label>
+          <input type="datetime-local" id="of_return_time">
+        </div>
+        <div class="form-row">
+          <label>退款时间</label>
+          <input type="datetime-local" id="of_refund_time">
+        </div>
+        <div class="form-row full">
+          <label>给客户看的备注</label>
+          <input type="text" id="of_customer_note" maxlength="500">
+        </div>
+      </div>
+
+      <div class="section-title">设备清单 * <span class="muted">日租金单位：元/件/天</span></div>
+      <div class="items-editor" id="itemsEditor"></div>
+      <button type="button" class="btn secondary small" id="addItemBtn">＋ 添加设备</button>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:22px;">
+        <button type="button" class="btn secondary" id="orderDialogCancel">取消</button>
+        <button type="submit" class="btn">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 异常标记弹窗 -->
+<div class="dialog-mask hidden" id="abnDialog">
+  <div class="dialog" style="max-width:480px;">
+    <h3>标记异常订单</h3>
+    <div id="abnAlert"></div>
+    <input type="hidden" id="abn_order_no">
+    <div class="form-row">
+      <label>订单号</label>
+      <input type="text" id="abn_view_no" disabled>
+    </div>
+    <div class="form-row">
+      <label>异常说明 *（仅限内部查看，客户不可见）</label>
+      <textarea id="abn_note" rows="4" maxlength="500" placeholder="如：镜头前镜片划伤、配件缺失、逾期未还等"></textarea>
+    </div>
+    <div class="form-row">
+      <label>同步调整押金状态（可选）</label>
+      <select id="abn_deposit_status">
+        <option value="">不调整</option>
+        <option value="held">押金冻结中</option>
+        <option value="deducted">押金已部分扣除</option>
+        <option value="refunding">退款处理中</option>
+        <option value="refunded">押金已退还</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn secondary" id="abnCancel">取消</button>
+      <button class="btn danger" id="abnSave">确认标记异常</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/admin.js"></script>
+</body>
+</html>

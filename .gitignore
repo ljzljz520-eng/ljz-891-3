@@ -23,3 +23,10 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 摄影器材租赁押金查询系统
+/tools/
+/data/*
+!/data/.gitkeep
+*.sqlite
+*.sqlite-journal

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>押金查询 · 光影租赁</title>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<div class="container">
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo">📷</div>
+      <div>
+        <h1>光影摄影器材租赁</h1>
+        <small>租赁押金自助查询</small>
+      </div>
+    </div>
+    <a class="btn secondary small" href="/admin/">后台登录</a>
+  </header>
+
+  <div class="card">
+    <h2>押金与归还状态查询</h2>
+    <p class="sub">请输入下单时的订单号和预留手机号。为保障信息安全，两者必须同时匹配方可查询。</p>
+
+    <div id="alertBox" class="alert"></div>
+
+    <form id="queryForm" autocomplete="off">
+      <div class="form-row">
+        <label for="order_no">订单号</label>
+        <input type="text" id="order_no" name="order_no" maxlength="32"
+               placeholder="例如 RP7K2M9QX4NT" required>
+      </div>
+      <div class="form-row">
+        <label for="phone">预留手机号</label>
+        <input type="tel" id="phone" name="phone" maxlength="13"
+               placeholder="11 位手机号" inputmode="numeric" required>
+      </div>
+      <div class="form-row">
+        <label>安全验证</label>
+        <div class="captcha-row">
+          <input type="text" id="captcha_answer" maxlength="6" placeholder="计算结果" inputmode="numeric" required>
+          <div class="captcha-box" id="captchaBox" title="点击更换">
+            <span id="captchaQuestion">加载中…</span><span class="refresh">换一张</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn" type="submit" id="submitBtn" style="width:100%">查 询</button>
+    </form>
+
+    <ul class="privacy-tips">
+      <li>订单号与手机号不匹配将无法看到任何订单信息，连续错误 5 次会临时锁定 15 分钟。</li>
+      <li>页面仅展示与押金相关的必要信息，不会显示完整手机号等个人资料。</li>
+      <li>如忘记订单号或更换过手机号，请联系门店工作人员核实身份后处理。</li>
+    </ul>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <div class="section-title">
+      <span>查询结果 · <span id="rOrderNo"></span></span>
+      <button class="btn secondary small" onclick="window.print()">打印 / 保存</button>
+    </div>
+
+    <div class="result-summary">
+      <div class="stat">
+        <div class="k">押金金额</div>
+        <div class="v big">¥<span id="rDeposit"></span></div>
+      </div>
+      <div class="stat">
+        <div class="k">押金状态</div>
+        <div class="v"><span class="badge" id="rDepositStatus"></span></div>
+      </div>
+      <div class="stat">
+        <div class="k">归还状态</div>
+        <div class="v"><span class="badge" id="rRentalStatus"></span></div>
+      </div>
+      <div class="stat">
+        <div class="k">退款时间</div>
+        <div class="v" id="rRefundTime" style="font-size:14px"></div>
+      </div>
+    </div>
+
+    <div class="section-title">设备清单</div>
+    <table>
+      <thead><tr><th>设备</th><th>型号</th><th>数量</th><th>日租金（元/件）</th></tr></thead>
+      <tbody id="rItems"></tbody>
+    </table>
+
+    <div class="section-title">租期信息</div>
+    <table>
+      <tbody id="rPeriod"></tbody>
+    </table>
+
+    <div class="alert info show" id="rRefundNote" style="margin-top:16px"></div>
+    <div class="alert info show hidden" id="rNotice"></div>
+  </div>
+</div>
+<script src="/assets/app.js"></script>
+</body>
+</html>
